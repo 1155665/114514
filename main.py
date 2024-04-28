@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
-import tkinter as tk
+
 import matplotlib.pyplot as plt
 import api.bd_api as bd_api
+from api.tx_api import *
 
 import pretty_errors
 pretty_errors.activate()
@@ -24,26 +25,11 @@ cleaned_data = cleaned_data.str.replace('体格检查：', '')
 cleaned_data = cleaned_data.str.replace('影像检查：', '')
 
 # Output the cleaned data without duplicate values
-print(cleaned_data)
+# print(cleaned_data)
 
+# Write the cleaned data to the 29th column
+data.insert(32, "CLEANED", cleaned_data)
+#data.iloc[:, 32] = cleaned_data
+# Save the updated file
+data.to_csv('/Users/surui/Downloads/updated_data.csv', index=False)
 
-
-
-
-''''
-# Create a new window
-window = tk.Tk()
-
-# Add GUI elements and define their behavior
-
-# Define the behavior 
-def my_function():
-    # Code to be executed when the button is clicked
-    print("Button clicked!")
-# Create a button
-button = tk.Button(window, text="Click Me", command=my_function)
-# Add the button to the window
-button.pack()
-# Run the GUI event loop
-window.mainloop()
-'''
