@@ -1,4 +1,4 @@
-from bd_api import *
+from api.bd_api import *
 import pretty_errors
 pretty_errors.activate()
 

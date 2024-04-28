@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import tkinter as tk
 import matplotlib.pyplot as plt
-import bd_api
+import api.bd_api as bd_api
 
 import pretty_errors
 pretty_errors.activate()
