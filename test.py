@@ -13,3 +13,4 @@ while True:
         print(f"情感倾向: {sentiment}, 极性: {polarity}, 主观性: {subjectivity}")
     else:
         print("翻译失败，请稍后重试。")
+
