@@ -63,6 +63,7 @@ test.head()
 # #### 训练模型
 
 from sklearn.naive_bayes import MultinomialNB
+
 nb = MultinomialNB()
 
 X_train_cleaned = X_train[y_train.notnull()]
@@ -70,19 +71,71 @@ y_train_cleaned = y_train[y_train.notnull()]
 
 X_train_vect = vect.fit_transform(X_train_cleaned)
 nb.fit(X_train_vect, y_train_cleaned)
+
+
+# #### 评估模型
 train_score = nb.score(X_train_vect, y_train_cleaned)
 print(train_score)
 
-
-
-# #### 测试模型
-
 X_test_vect = vect.transform(X_test)
-nb.fit(X_test_vect, y_test)
-print(nb.score(X_test_vect, y_test))
+
+# 计算精确率
+from sklearn.metrics import precision_score
+
+precision = precision_score(y_test, nb.predict(X_test_vect), average='weighted')
+print("精确率:", precision)
+
+# 计算召回率
+from sklearn.metrics import recall_score
+
+recall = recall_score(y_test, nb.predict(X_test_vect), average='weighted')
+print("召回率:", recall)
+
+
+# 计算F1值
+from sklearn.metrics import f1_score
+
+f1 = f1_score(y_test, nb.predict(X_test_vect), average='weighted')
+print("F1值:", f1)
+
+# 计算准确率
+from sklearn.metrics import accuracy_score
+
+accuracy = accuracy_score(y_test, nb.predict(X_test_vect))
+print("准确率:", accuracy)
+
+
+
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
+
+# 计算真值
+y_test_true = y_test
+
+# 计算预测值
+y_test_pred = nb.predict_proba(X_test_vect)[:,1]
+
+# 计算ROC曲线
+fpr, tpr, thresholds = roc_curve(y_test_true, y_test_pred)
+roc_auc = auc(fpr, tpr)
+
+# 绘制ROC曲线
+plt.figure()
+plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic')
+plt.legend(loc="lower right")
+plt.show()
+
+
 
 
 # #### 分析数据 
+
 
 data = pd.read_excel(r"C:\Users\18356\Desktop\大一年度项目资料\中文文本情感分析_new\data.xlsx")
 data.head()
