@@ -111,7 +111,7 @@ import matplotlib.pyplot as plt
 
 # 计算真值
 y_test_true = y_test
-
+print(y_test_true)
 # 计算预测值
 y_test_pred = nb.predict_proba(X_test_vect)[:,1]
 
