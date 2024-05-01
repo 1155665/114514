@@ -1,14 +1,14 @@
 
 import numpy as np
 import pandas as pd
-import pretty_errors
-pretty_errors.activate()
+from rich import traceback
+traceback.install()
 
 '''
 先改这个！！！
 '''
 ############################################
-user1 = input("请输入你姓名首写小字母：")
+user1 = "sr"
 ############################################
 
 if(user1=="rbq"):
@@ -16,7 +16,7 @@ if(user1=="rbq"):
     stop_words_file = r"D:\大一年度项目资料\中文文本情感分析_new\哈工大停用词表.txt"
     data=r"D:\大一年度项目资料\中文文本情感分析_new\data.xlsx"
 elif(user1=="sr"):
-    ori_data=r"/Users/surui/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/cfa43d013fb378e45355d09126bc529f/Message/MessageTemp/bd32bd434566b9ad7bb1db6ed50133bf/File/ori data.xlsx"
+    ori_data=r"/Users/surui/Desktop/ori data(1).xlsx"
     stop_words_file = r"中文文本情感分析_new/哈工大停用词表.txt"
     data=r"data.xlsx"
 elif(user1=="hjm"):
@@ -171,11 +171,11 @@ def draw():
 # #### 分析数据 
 
 
-def ana():
+def ana(d):
     
     #data.head()
     
-    data = pd.read_excel(data)#？
+    data = pd.read_excel(d)#？
     #data = pd.read_excel("data.xlsx")#？？这是啥  #错了错了,sorry
 
     #data['cut_comment'] = data.comment.apply(chinese_word_cut)#
@@ -191,6 +191,5 @@ def ana():
 
     data.to_excel("data_result.xlsx",index=False)
 #先不分析
-#ana()
-
+#ana(data)
 
