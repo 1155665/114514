@@ -8,18 +8,18 @@ pretty_errors.activate()
 先改这个！！！
 '''
 ############################################
-user1 = "surui"
+user1 = input("请输入你姓名首写小字母：")
 ############################################
 
-if(user1=="renbaoqi"):
-    ori_data=r"C:\Users\18356\Desktop\大一年度项目资料\中文文本情感分析_new\ori data.xlsx"
-    stop_words_file = r"C:\Users\18356\Desktop\大一年度项目资料\中文文本情感分析_new\哈工大停用词表.txt"
-    data=r"C:\Users\18356\Desktop\大一年度项目资料\中文文本情感分析_new\data.xlsx"
-elif(user1=="surui"):
+if(user1=="rbq"):
+    ori_data=r"D:\大一年度项目资料\中文文本情感分析_new\ori data.xlsx"
+    stop_words_file = r"D:\大一年度项目资料\中文文本情感分析_new\哈工大停用词表.txt"
+    data=r"D:\大一年度项目资料\中文文本情感分析_new\data.xlsx"
+elif(user1=="sr"):
     ori_data=r"/Users/surui/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/cfa43d013fb378e45355d09126bc529f/Message/MessageTemp/bd32bd434566b9ad7bb1db6ed50133bf/File/ori data.xlsx"
     stop_words_file = r"中文文本情感分析_new/哈工大停用词表.txt"
     data=r"data.xlsx"
-elif(user1=="hujiaming"):
+elif(user1=="hjm"):
     ori_data=r""
     stop_words_file = r""
     data=r"" 
@@ -43,9 +43,10 @@ def chinese_word_cut(mytext):
 
     
 #更改一下，只让他分第一列--surui，将jieba分词的结果保存到data['cut_comment']中
-#data['cut_comment'] = data.comment.applynchinese_word_cut)
+data['cut_comment'] = data.comment.apply(chinese_word_cut)
 #和这个等价
-data['cut_comment'] = data.content.apply(chinese_word_cut)
+#data['cut_comment'] = data.content.apply(chinese_word_cut)
+
 #data['cut_comment'] = data.iloc[:, 0].apply(chinese_word_cut)
 data.head()
 
@@ -175,9 +176,9 @@ def ana():
     #data.head()
     
     data = pd.read_excel(data)#？
-    data = pd.read_excel("data.xlsx")#？？这是啥
+    #data = pd.read_excel("data.xlsx")#？？这是啥  #错了错了,sorry
 
-    #data['cut_comment'] = data.comment.apply(chinese_word_cut)#？？？这又是啥，把content改成comment了？？？
+    #data['cut_comment'] = data.comment.apply(chinese_word_cut)#
     X=data['cut_comment']
     X_vec = vect.transform(X)
     nb_result = nb.predict(X_vec)
