@@ -40,11 +40,13 @@ def chinese_word_cut(mytext):
     return" ".join(jieba.cut(mytext))
 
 
-    
+
     
 #更改一下，只让他分第一列--surui，将jieba分词的结果保存到data['cut_comment']中
-#data['cut_comment'] = data.comment.apply(chinese_word_cut)
-data['cut_comment'] = data.iloc[:, 0].apply(chinese_word_cut)
+#data['cut_comment'] = data.comment.applynchinese_word_cut)
+#和这个等价
+data['cut_comment'] = data.content.apply(chinese_word_cut)
+#data['cut_comment'] = data.iloc[:, 0].apply(chinese_word_cut)
 data.head()
 
 
@@ -169,11 +171,13 @@ def draw():
 
 
 def ana():
-    data = pd.read_excel(data)
-    data.head()
+    
+    #data.head()
+    
+    data = pd.read_excel(data)#？
+    data = pd.read_excel("data.xlsx")#？？这是啥
 
-    data = pd.read_excel("data.xlsx")
-    #data['cut_comment'] = data.comment.apply(chinese_word_cut)
+    #data['cut_comment'] = data.comment.apply(chinese_word_cut)#？？？这又是啥，把content改成comment了？？？
     X=data['cut_comment']
     X_vec = vect.transform(X)
     nb_result = nb.predict(X_vec)
