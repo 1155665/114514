@@ -8,7 +8,7 @@ traceback.install()
 先改这个！！！
 '''
 ############################################
-user1 = "sr"
+user1 = "rbq"
 ############################################
 
 if(user1=="rbq"):
@@ -148,13 +148,13 @@ y_test_pred = nb.predict_proba(X_test_vect)[:,1]
 # 计算ROC曲线
 # 切换字符串为数字--先不整
 y_test_true = y_test_true.replace({'1': 1, '0': 0})
-#fpr, tpr, thresholds = roc_curve(y_test_true, y_test_pred)
-#roc_auc = auc(fpr, tpr)
+fpr, tpr, thresholds = roc_curve(y_test_true, y_test_pred)
+roc_auc = auc(fpr, tpr)
 
 # 绘制ROC曲线---不画
 def draw():
     plt.figure()
-    #plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
     plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='-')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
@@ -164,7 +164,7 @@ def draw():
     plt.legend(loc="lower right")
     plt.show()
 
-#draw()
+draw()
 
 
 
