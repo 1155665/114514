@@ -1,14 +1,14 @@
 
 import numpy as np
 import pandas as pd
+pd.set_option('future.no_silent_downcasting', True)
 from rich import traceback,print
 from sklearn import metrics
-#from sklearn.preprocessing import label_binarize
+from sklearn.preprocessing import label_binarize
 traceback.install()
+import warnings
+warnings.filterwarnings("ignore")
 
-############################
-#那label_binarize是干啥的?
-############################
 '''
 先改这个！！！
 '''
@@ -51,7 +51,6 @@ def chinese_word_cut(mytext):
 data['cut_comment'] = data.comment.apply(chinese_word_cut)
 #和这个等价
 #data['cut_comment'] = data.content.apply(chinese_word_cut)
-
 #data['cut_comment'] = data.iloc[:, 0].apply(chinese_word_cut)
 data.head()
 
@@ -115,7 +114,7 @@ print("--------------------------------------------")
 
 # #### 评估模型
 train_score = nb.score(X_train_vect, y_train_cleaned)
-print("SCORE: ",train_score)
+print("SCORE :",train_score)
 
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
@@ -128,7 +127,7 @@ recall = recall_score(y_test, nb.predict(X_test_vect), average='weighted')
 print("召回率:", recall)
 # 计算F1值
 f1 = f1_score(y_test, nb.predict(X_test_vect), average='weighted')
-print("F1值 : ", f1)
+print("F1值  :", f1)
 # 计算准确率
 accuracy = accuracy_score(y_test, nb.predict(X_test_vect))
 print("准确率:", accuracy)
@@ -151,18 +150,22 @@ y_test_true = y_test
 y_test_pred = nb.predict_proba(X_test_vect)
 y_test = y_test_true.replace({'1': 1.0, '0': 0.0,'2':2.0})
 ytest_l = list(np.array(y_test))
-#ytest_one = label_binarize(ytest_l, classes=[0,1,2]) 
-ytest_one = ytest_l
+ytest_one = label_binarize(ytest_l, classes=[0,1,2]) 
+#ytest_one = ytest_l
 
 '''宏平均法'''
+#CC 4.0 BY-SA article：131918191
+#begin
+#json？字典？
 macro_AUC = {}
 macro_FPR = {}
 macro_TPR = {}
 # 获的每一个类别对应的TPR、FPR、AUC
+# 这啥意思？
 for i in range(ytest_one.shape[1]):
     macro_FPR[i],macro_TPR[i],thresholds = metrics.roc_curve(ytest_one[:,i], y_test_pred[:,i])
     macro_AUC[i] = metrics.auc(macro_FPR[i],macro_TPR[i])
-print(macro_AUC)
+print("macro_AUC :",macro_AUC)
  
 # 把所有的FPR合并去重、排序
 macro_FPR_final = np.unique(np.concatenate([macro_FPR[i] for i in range(ytest_one.shape[1])]))
@@ -189,7 +192,7 @@ plt.grid(linestyle='-.')
 plt.legend(loc='lower right',framealpha=0.8, fontsize=8)
 plt.show()
 
-
+#end
 
 
 
