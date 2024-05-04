@@ -1,16 +1,19 @@
 
 import numpy as np
 import pandas as pd
-from rich import traceback
+from rich import traceback,print
 from sklearn import metrics
-from sklearn.preprocessing import label_binarize
+#from sklearn.preprocessing import label_binarize
 traceback.install()
 
+############################
+#那label_binarize是干啥的?
+############################
 '''
 先改这个！！！
 '''
 ############################################
-user1 = "rbq"
+user1 = "sr"
 ############################################
 
 if(user1=="rbq"):
@@ -18,7 +21,7 @@ if(user1=="rbq"):
     stop_words_file = r"D:\大一年度项目资料\中文文本情感分析_new\哈工大停用词表.txt"
     data=r"D:\大一年度项目资料\中文文本情感分析_new\data.xlsx"
 elif(user1=="sr"):
-    ori_data=r"/Users/surui/Desktop/ori data(1).xlsx"
+    ori_data=r"/Users/surui/Desktop/ori data.xlsx"
     stop_words_file = r"中文文本情感分析_new/哈工大停用词表.txt"
     data=r"data.xlsx"
 elif(user1=="hjm"):
@@ -106,38 +109,32 @@ nb.fit(X_train_vect, y_train_cleaned)
 import joblib
 joblib.dump(nb, 'model.pkl')
 
+print("")
+print("评估")
+print("--------------------------------------------")
+
 # #### 评估模型
 train_score = nb.score(X_train_vect, y_train_cleaned)
-print(train_score)
+print("SCORE: ",train_score)
+
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
 X_test_vect = vect.transform(X_test)
-
 # 计算精确率
-from sklearn.metrics import precision_score
-
 precision = precision_score(y_test, nb.predict(X_test_vect), average='weighted')
 print("精确率:", precision)
-
 # 计算召回率
-from sklearn.metrics import recall_score
-
 recall = recall_score(y_test, nb.predict(X_test_vect), average='weighted')
 print("召回率:", recall)
-
-
 # 计算F1值
-from sklearn.metrics import f1_score
-
 f1 = f1_score(y_test, nb.predict(X_test_vect), average='weighted')
-print("F1值:", f1)
-
+print("F1值 : ", f1)
 # 计算准确率
-from sklearn.metrics import accuracy_score
-
 accuracy = accuracy_score(y_test, nb.predict(X_test_vect))
 print("准确率:", accuracy)
 
-
+print("--------------------------------------------")
+print("")
 
 from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import roc_auc_score
@@ -154,7 +151,8 @@ y_test_true = y_test
 y_test_pred = nb.predict_proba(X_test_vect)
 y_test = y_test_true.replace({'1': 1.0, '0': 0.0,'2':2.0})
 ytest_l = list(np.array(y_test))
-ytest_one = label_binarize(ytest_l, classes=[0,1,2]) 
+#ytest_one = label_binarize(ytest_l, classes=[0,1,2]) 
+ytest_one = ytest_l
 
 '''宏平均法'''
 macro_AUC = {}
@@ -176,8 +174,6 @@ for i in range(ytest_one.shape[1]):
 macro_TPR_final = macro_TPR_all / ytest_one.shape[1] # 注：当FPR对应多个TPR时，interp会返回最大的那个TPR
 macro_AUC_final = metrics.auc(macro_FPR_final, macro_TPR_final)
  
-
-
 '''画图'''
 plt.figure(figsize=(8,6))
 plt.plot(macro_FPR[0],macro_TPR[0],'b.-', label='1ROC  AUC={:.2f}'.format(macro_AUC[0]), lw=2)
@@ -185,7 +181,7 @@ plt.plot(macro_FPR[1],macro_TPR[1],'y.-', label='2ROC  AUC={:.2f}'.format(macro_
 plt.plot(macro_FPR[2],macro_TPR[2],'r.-', label='3ROC  AUC={:.2f}'.format(macro_AUC[2]), lw=2)
 plt.plot(macro_FPR_final,macro_TPR_final,'kx-', label='macroROC  AUC={:.2f}'.format(macro_AUC_final), lw=2)
 
-plt.plot([0,1], [0,1], 'k--', label='45degree')
+plt.plot([0,1], [0,1], 'k--', label='random classifier') 
 plt.xlabel('FPR',fontsize=13)
 plt.ylabel('TPR',fontsize=13)
 plt.title('doctors_sentiment_analysis',fontsize=13)
