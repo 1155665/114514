@@ -2,6 +2,8 @@
 import numpy as np
 import pandas as pd
 from rich import traceback
+from sklearn import metrics
+from sklearn.preprocessing import label_binarize
 traceback.install()
 
 '''
@@ -76,6 +78,8 @@ vect = CountVectorizer(max_df = 0.8,
 X = data['cut_comment']
 y = data.sentiment
 
+
+
 from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=22)
@@ -136,6 +140,10 @@ print("准确率:", accuracy)
 
 
 from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_auc_score
+
+
+
 import matplotlib.pyplot as plt
 
 # 计算真值
@@ -143,28 +151,53 @@ y_test_true = y_test
 #打印什么真值，不打印，闹心
 #print(y_test_true)
 # 计算预测值
-y_test_pred = nb.predict_proba(X_test_vect)[:,1]
+y_test_pred = nb.predict_proba(X_test_vect)
+y_test = y_test_true.replace({'1': 1.0, '0': 0.0,'2':2.0})
+ytest_l = list(np.array(y_test))
+ytest_one = label_binarize(ytest_l, classes=[0,1,2]) 
 
-# 计算ROC曲线
-# 切换字符串为数字--先不整
-y_test_true = y_test_true.replace({'1': 1, '0': 0})
-fpr, tpr, thresholds = roc_curve(y_test_true, y_test_pred)
-roc_auc = auc(fpr, tpr)
+'''宏平均法'''
+macro_AUC = {}
+macro_FPR = {}
+macro_TPR = {}
+# 获的每一个类别对应的TPR、FPR、AUC
+for i in range(ytest_one.shape[1]):
+    macro_FPR[i],macro_TPR[i],thresholds = metrics.roc_curve(ytest_one[:,i], y_test_pred[:,i])
+    macro_AUC[i] = metrics.auc(macro_FPR[i],macro_TPR[i])
+print(macro_AUC)
+ 
+# 把所有的FPR合并去重、排序
+macro_FPR_final = np.unique(np.concatenate([macro_FPR[i] for i in range(ytest_one.shape[1])]))
+ 
+# 在每个类别中计算macro_FPR_final对应的TPR 并相加求平均
+macro_TPR_all = np.zeros_like(macro_FPR_final)
+for i in range(ytest_one.shape[1]):
+    macro_TPR_all = macro_TPR_all + np.interp(macro_FPR_final, macro_FPR[i], macro_TPR[i])
+macro_TPR_final = macro_TPR_all / ytest_one.shape[1] # 注：当FPR对应多个TPR时，interp会返回最大的那个TPR
+macro_AUC_final = metrics.auc(macro_FPR_final, macro_TPR_final)
+ 
 
-# 绘制ROC曲线---不画
-def draw():
-    plt.figure()
-    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
-    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='-')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver Operating Characteristic')
-    plt.legend(loc="lower right")
-    plt.show()
 
-draw()
+'''画图'''
+plt.figure(figsize=(8,6))
+plt.plot(macro_FPR[0],macro_TPR[0],'b.-', label='1ROC  AUC={:.2f}'.format(macro_AUC[0]), lw=2)
+plt.plot(macro_FPR[1],macro_TPR[1],'y.-', label='2ROC  AUC={:.2f}'.format(macro_AUC[1]), lw=2)
+plt.plot(macro_FPR[2],macro_TPR[2],'r.-', label='3ROC  AUC={:.2f}'.format(macro_AUC[2]), lw=2)
+plt.plot(macro_FPR_final,macro_TPR_final,'kx-', label='macroROC  AUC={:.2f}'.format(macro_AUC_final), lw=2)
+
+plt.plot([0,1], [0,1], 'k--', label='45degree')
+plt.xlabel('FPR',fontsize=13)
+plt.ylabel('TPR',fontsize=13)
+plt.title('doctors_sentiment_analysis',fontsize=13)
+plt.grid(linestyle='-.')
+plt.legend(loc='lower right',framealpha=0.8, fontsize=8)
+plt.show()
+
+
+
+
+
+
 
 
 
