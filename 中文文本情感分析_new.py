@@ -21,8 +21,8 @@ if(user1=="rbq"):
     stop_words_file = r"D:\大一年度项目资料\中文文本情感分析_new\哈工大停用词表.txt"
     data=r"D:\大一年度项目资料\中文文本情感分析_new\data.xlsx"
 elif(user1=="sr"):
-    ori_data=r"/Users/surui/Desktop/ori data.xlsx"
-    stop_words_file = r"中文文本情感分析_new/哈工大停用词表.txt"
+    ori_data=r"/Users/surui/Desktop/ori data(1) 2.xlsx"
+    stop_words_file = r"朴素贝叶斯/哈工大停用词表.txt"
     data=r"data.xlsx"
 elif(user1=="hjm"):
     ori_data=r""
@@ -46,18 +46,13 @@ def chinese_word_cut(mytext):
 
 
 
-    
 #更改一下，只让他分第一列--surui，将jieba分词的结果保存到data['cut_comment']中
-data['cut_comment'] = data.comment.apply(chinese_word_cut)
-#和这个等价
+#和这个等价，此文件第一列是comment，反正是第一列，注意你的文本是第几列
 #data['cut_comment'] = data.content.apply(chinese_word_cut)
-#data['cut_comment'] = data.iloc[:, 0].apply(chinese_word_cut)
+data['cut_comment'] = data.iloc[:, 0].apply(chinese_word_cut)
 data.head()
 
-
 # #### 提取特征
-
-
 from sklearn.feature_extraction.text import CountVectorizer
 
 def get_custom_stopwords(stop_words_file):
@@ -80,17 +75,13 @@ vect = CountVectorizer(max_df = 0.8,
 X = data['cut_comment']
 y = data.sentiment
 
-
-
 from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=22)
 
-
 #特征展示
-test = pd.DataFrame(vect.fit_transform(X_train).toarray(), columns=vect.get_feature_names_out())
-test.head()
-
+#test = pd.DataFrame(vect.fit_transform(X_train).toarray(), columns=vect.get_feature_names_out())
+#test.head()
 
 # #### 训练模型
 
@@ -98,13 +89,13 @@ from sklearn.naive_bayes import MultinomialNB
 
 nb = MultinomialNB()
 
-X_train_cleaned = X_train[y_train.notnull()]
-y_train_cleaned = y_train[y_train.notnull()]
-
+min_length = 3
+X_train_cleaned = X_train[X_train.str.len() >= min_length]
+y_train_cleaned = y_train[X_train.str.len() >= min_length]
 X_train_vect = vect.fit_transform(X_train_cleaned)
 nb.fit(X_train_vect, y_train_cleaned)
 
-# 保存模形--- 没有，先不保存
+# 保存
 import joblib
 joblib.dump(nb, 'model.pkl')
 
@@ -112,7 +103,7 @@ print("")
 print("评估")
 print("--------------------------------------------")
 
-# #### 评估模型
+#评估模型
 train_score = nb.score(X_train_vect, y_train_cleaned)
 print("SCORE :",train_score)
 
@@ -135,10 +126,9 @@ print("准确率:", accuracy)
 print("--------------------------------------------")
 print("")
 
-from sklearn.metrics import roc_curve, auc
-from sklearn.metrics import roc_auc_score
 
-
+#from sklearn.metrics import roc_curve, auc,roc_auc_score
+#from sklearn.metrics import 
 
 import matplotlib.pyplot as plt
 
@@ -156,12 +146,10 @@ ytest_one = label_binarize(ytest_l, classes=[0,1,2])
 '''宏平均法'''
 #CC 4.0 BY-SA article：131918191
 #begin
-#json？字典？
 macro_AUC = {}
 macro_FPR = {}
 macro_TPR = {}
 # 获的每一个类别对应的TPR、FPR、AUC
-# 这啥意思？
 for i in range(ytest_one.shape[1]):
     macro_FPR[i],macro_TPR[i],thresholds = metrics.roc_curve(ytest_one[:,i], y_test_pred[:,i])
     macro_AUC[i] = metrics.auc(macro_FPR[i],macro_TPR[i])
@@ -198,30 +186,25 @@ plt.show()
 
 
 
-
-
-# #### 分析数据 
+# #### 标数据 
 
 
 def ana(d):
-    
     #data.head()
-    
     data = pd.read_excel(d)#？
     #data = pd.read_excel("data.xlsx")#？？这是啥  #错了错了,sorry
-
     #data['cut_comment'] = data.comment.apply(chinese_word_cut)#
+
     X=data['cut_comment']
     X_vec = vect.transform(X)
     nb_result = nb.predict(X_vec)
+
     #predict_proba(X)[source] 返回概率
     data['nb_result'] = nb_result
-
-
     test = pd.DataFrame(vect.fit_transform(X).toarray(), columns=vect.get_feature_names_out())
     test.head()
-
     data.to_excel("data_result.xlsx",index=False)
+    #return ?
 #先不分析
 #ana(data)
 

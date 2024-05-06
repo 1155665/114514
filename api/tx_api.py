@@ -5,7 +5,7 @@ import json
 import sys
 import time
 
-from secret.secret import id, key
+from api.secret.secret import id, key
 
 from datetime import datetime
 from http.client import HTTPSConnection
