@@ -5,11 +5,11 @@ import pandas as pd
 from api.tx_api import *
 import json
 from tqdm import tqdm
-import asyncio
+#import asyncio #失败，好心人帮看看
 import sys
+#import time
+from ratelimit import limits, sleep_and_retry
 import time
-from ratelimit import limits, sleep_and_retry
-from ratelimit import limits, sleep_and_retry
 
 # ####if试是否可用
 if(1==0):
@@ -38,7 +38,12 @@ second_column = data.iloc[:, 1]
 #print(first_column)
 
 def api(text):
-    
+    text = text.strip()  # Remove leading and trailing whitespace
+    text = text.lower()  # Convert text to lowercase
+    text = text.replace(" ", "")  # Remove all spaces from text
+    text = ''.join(c for c in text if c.isalnum() or c.isspace())
+    if not text:
+        return "ERROR 文本为空！"
     response_json = tx_api(text)
     response_data = json.loads(response_json)
     try:
@@ -65,11 +70,18 @@ if(1==1):
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         results = executor.map(process_text, first_column)
-        sys.setrecursionlimit(10**9)
+        sys.setrecursionlimit(10**9)#这个才有用，不然会报错，浪费了5000多条
+        timeout = 100000
+        start_time = time.time()
+        # Iterate over results 这个枚举有时间限制，上面那个timeout是骗他的，是纯忽悠人的
         for result in results:
             data1.append(result)
             tqdm.write(f"Processed: {len(data1)} / {len(first_column)}")
 
+
+            # Check if timeout has been reached
+            if time.time() - start_time >= timeout:
+                break
     print(data1)
 
     df = pd.DataFrame({
