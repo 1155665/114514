@@ -85,19 +85,30 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # #### 训练模型
 
-from sklearn.naive_bayes import MultinomialNB
-
-nb = MultinomialNB()
-
 min_length = 3
 X_train_cleaned = X_train[X_train.str.len() >= min_length]
 y_train_cleaned = y_train[X_train.str.len() >= min_length]
 X_train_vect = vect.fit_transform(X_train_cleaned)
-nb.fit(X_train_vect, y_train_cleaned)
 
-# 保存
-import joblib
-joblib.dump(nb, 'model.pkl')
+a = 4
+if(a==1):
+    from sklearn.naive_bayes import MultinomialNB
+    nb = MultinomialNB()
+    nb.fit(X_train_vect, y_train_cleaned)
+if(a==2):
+    from sklearn.ensemble import RandomForestClassifier
+    nb = RandomForestClassifier()
+    nb.fit(X_train_vect, y_train_cleaned)
+if(a==3):
+    from sklearn.linear_model import LogisticRegression
+    nb = LogisticRegression()
+    nb.fit(X_train_vect, y_train_cleaned)
+if(a==4):
+    from sklearn.svm import SVC
+    nb = SVC()
+    nb.fit(X_train_vect, y_train_cleaned)
+
+
 
 print("")
 print("评估")
@@ -108,6 +119,8 @@ train_score = nb.score(X_train_vect, y_train_cleaned)
 print("SCORE :",train_score)
 
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+
+
 
 X_test_vect = vect.transform(X_test)
 # 计算精确率

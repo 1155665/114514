@@ -67,7 +67,7 @@ if(1==1):
         except:
             sentiment = "Error"
         return sentiment
-
+    #这是多线程
     with concurrent.futures.ThreadPoolExecutor() as executor:
         results = executor.map(process_text, first_column)
         sys.setrecursionlimit(10**9)#这个才有用，不然会报错，浪费了5000多条
