@@ -21,7 +21,7 @@ if(user1=="rbq"):
     stop_words_file = r"D:\大一年度项目资料\中文文本情感分析_new\哈工大停用词表.txt"
     data=r"D:\大一年度项目资料\中文文本情感分析_new\data.xlsx"
 elif(user1=="sr"):
-    ori_data=r"/Users/surui/Desktop/ori data(1) 2.xlsx"
+    ori_data=r"/Users/surui/Desktop/ori data 1.xlsx"
     stop_words_file = r"朴素贝叶斯/哈工大停用词表.txt"
     data=r"data.xlsx"
 elif(user1=="hjm"):
@@ -78,22 +78,30 @@ y = data.sentiment
 from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=22)
-
-#特征展示
-#test = pd.DataFrame(vect.fit_transform(X_train).toarray(), columns=vect.get_feature_names_out())
-#test.head()
-
 # #### 训练模型
 
-from sklearn.naive_bayes import MultinomialNB
-
-nb = MultinomialNB()
-
-min_length = 3
+min_length = 4
 X_train_cleaned = X_train[X_train.str.len() >= min_length]
 y_train_cleaned = y_train[X_train.str.len() >= min_length]
 X_train_vect = vect.fit_transform(X_train_cleaned)
-nb.fit(X_train_vect, y_train_cleaned)
+
+a = 4
+if(a==1):
+    from sklearn.naive_bayes import MultinomialNB
+    nb = MultinomialNB()
+    nb.fit(X_train_vect, y_train_cleaned)
+if(a==2):
+    from sklearn.ensemble import RandomForestClassifier
+    nb = RandomForestClassifier()
+    nb.fit(X_train_vect, y_train_cleaned)
+if(a==3):
+    from sklearn.linear_model import LogisticRegression
+    nb = LogisticRegression()
+    nb.fit(X_train_vect, y_train_cleaned)
+if(a==4):
+    from sklearn.svm import SVC
+    nb = SVC()
+    nb.fit(X_train_vect, y_train_cleaned)
 
 # 保存
 import joblib
@@ -137,7 +145,11 @@ y_test_true = y_test
 #打印什么真值，不打印，闹心
 #print(y_test_true)
 # 计算预测值
-y_test_pred = nb.predict_proba(X_test_vect)
+if(a==1 or a==2):
+    y_test_pred = nb.predict_proba(X_test_vect)
+else:
+    y_test_pred = nb.decision_function(X_test_vect)
+
 y_test = y_test_true.replace({'1': 1.0, '0': 0.0,'2':2.0})
 ytest_l = list(np.array(y_test))
 ytest_one = label_binarize(ytest_l, classes=[0,1,2]) 
@@ -175,7 +187,17 @@ plt.plot(macro_FPR_final,macro_TPR_final,'kx-', label='macroROC  AUC={:.2f}'.for
 plt.plot([0,1], [0,1], 'k--', label='random classifier') 
 plt.xlabel('FPR',fontsize=13)
 plt.ylabel('TPR',fontsize=13)
-plt.title('doctors_sentiment_analysis',fontsize=13)
+
+if(a==1):
+    at = "MultinomialNB"
+elif(a==2):
+    at = "RandomForestClassifier"
+elif(a==3):
+    at = "LogisticRegression"
+elif(a==4):
+    at = "SVM"
+
+plt.title(at,fontsize=13)
 plt.grid(linestyle='-.')
 plt.legend(loc='lower right',framealpha=0.8, fontsize=8)
 plt.show()
@@ -184,7 +206,7 @@ plt.show()
 
 
 
-
+'''
 
 # #### 标数据 
 
@@ -208,3 +230,4 @@ def ana(d):
 #先不分析
 #ana(data)
 
+'''
